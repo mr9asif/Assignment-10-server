@@ -35,13 +35,12 @@ async function run() {
 
 //    Multiple item post
        app.post('/tourists', async(req, res)=>{
-        const Tourist = [
-            { name: "cake", healthy: false },
-            { name: "lettuce", healthy: true },
-            { name: "donut", healthy: false }
-          ];
+        const Tourist = {
+          title: "Record of a Shriveled Datum",
+          content: "No bytes, no problem. Just insert a document, in MongoDB",
+        }
           const options = { ordered: true };
-          const result = await foods.insertMany(Tourist, options);
+          const result = await foods.insertOne(Tourist, options);
           res.send(result)
        })
 
