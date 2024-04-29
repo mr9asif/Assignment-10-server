@@ -30,9 +30,14 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
+    // main database
     const database = client.db("TravelerDB");
+   
     const TravelesCollection = database.collection("Traveles");
+
+    // country database
+    const CountryCollection=client.db("TravelerDB").collection("Countries")
 
 //    Multiple item post
        app.post('/addTourists', async(req, res)=>{
@@ -44,11 +49,18 @@ async function run() {
           res.send(result)
           console.log(result)
        })
+      //  country post
+      app.post('/addCountries',async(req,res)=>{
+         const country = req.body;
+         const result = await CountryCollection.insertOne(country)
+         res.send(result)
+         console.log(result)
+      })
 
       //  put
       app.put('/update/:id', async(req,res)=>{
          console.log(req.params.id)
-         const id= req.body.id;
+         const id= req.params.id;
          const query = {_id: new ObjectId(id)}
          const updateSport={
            $set:{
@@ -71,10 +83,26 @@ async function run() {
     //    get
      app.get('/addTourists', async(req, res)=>{
         const cursor = TravelesCollection.find();
-        const result = await cursor.toArray();
+        const result = (await cursor.toArray());
         res.send(result)
         console.log(result)
      })
+
+// -----------------
+ app.get('/countries', async(req,res)=>{
+    const result = await CountryCollection.find().toArray()
+    res.send(result)
+ })
+
+ app.get('/countries/:name',async(req, res)=>{
+    const CountryName= {countryName: req.params.name};
+    console.log(req.params.name)
+    console.log(CountryName)
+    const result= await CountryCollection.find(CountryName).toArray()
+    // console.log(result)
+    res.send(result)
+ })
+
 
     //  single tourist
     app.get('/viewDetails/:id', async(req, res)=>{
@@ -82,6 +110,16 @@ async function run() {
       console.log(id)
       const query = {_id: new ObjectId(id)}
        const result = await TravelesCollection.findOne(query);
+       console.log(result)
+       res.send(result)
+    })
+    //  single country details
+    app.get('/Details/:id', async(req, res)=>{
+      const id = req.params.id;
+      console.log(id)
+      const query = {_id: new ObjectId(id)}
+       const result = await CountryCollection.findOne(query);
+       console.log(result)
        console.log(result)
        res.send(result)
     })
@@ -113,12 +151,15 @@ async function run() {
         console.log(result)
      })
 
-
+     app.listen(port, ()=>{
+      console.log(`server is running ..${port}`)
+  })
+  
 
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
@@ -130,9 +171,4 @@ run().catch(console.dir);
 
 
 
-app.listen(port, ()=>{
-    console.log(`server is running ..${port}`)
-})
 
-// QGcOjw6mLlLsVg0Y
-// Traveler
